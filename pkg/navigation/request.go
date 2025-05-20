@@ -31,6 +31,8 @@ func (n *Request) RequestURL() string {
 		return n.URL
 	case "HEAD":
 		return n.URL
+	case "OPTIONS":
+		return n.URL
 	case "POST":
 		builder := &strings.Builder{}
 		builder.WriteString(n.URL)
