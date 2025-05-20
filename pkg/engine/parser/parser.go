@@ -256,17 +256,17 @@ func bodyAudioTagParser(resp *navigation.Response) (navigationRequests []*naviga
 	resp.Reader.Find("audio").Each(func(i int, item *goquery.Selection) {
 		src, ok := item.Attr("src")
 		if ok && src != "" {
-			navigationRequests = append(navigationRequests, navigation.NewNavigationRequestURLFromResponse(src, resp.Resp.Request.URL.String(), "audio", "src", resp))
+			navigationRequests = append(navigationRequests, navigation.NewNavigationHeadRequestURLFromResponse(src, resp.Resp.Request.URL.String(), "audio", "src", resp))
 		}
 		item.Find("source").Each(func(i int, s *goquery.Selection) {
 			src, ok := s.Attr("src")
 			if ok && src != "" {
-				navigationRequests = append(navigationRequests, navigation.NewNavigationRequestURLFromResponse(src, resp.Resp.Request.URL.String(), "audio", "source", resp))
+				navigationRequests = append(navigationRequests, navigation.NewNavigationHeadRequestURLFromResponse(src, resp.Resp.Request.URL.String(), "audio", "source", resp))
 			}
 			srcSet, ok := s.Attr("srcset")
 			if ok && srcSet != "" {
 				for _, value := range utils.ParseSRCSetTag(srcSet) {
-					navigationRequests = append(navigationRequests, navigation.NewNavigationRequestURLFromResponse(value, resp.Resp.Request.URL.String(), "audio", "sourcesrcset", resp))
+					navigationRequests = append(navigationRequests, navigation.NewNavigationHeadRequestURLFromResponse(value, resp.Resp.Request.URL.String(), "audio", "sourcesrcset", resp))
 				}
 			}
 		})
@@ -294,7 +294,7 @@ func bodyImgTagParser(resp *navigation.Response) (navigationRequests []*navigati
 	resp.Reader.Find("img").Each(func(i int, item *goquery.Selection) {
 		srcDynsrc, ok := item.Attr("dynsrc")
 		if ok && srcDynsrc != "" {
-			navigationRequests = append(navigationRequests, navigation.NewNavigationRequestURLFromResponse(srcDynsrc, resp.Resp.Request.URL.String(), "img", "dynsrc", resp))
+			navigationRequests = append(navigationRequests, navigation.NewNavigationHeadRequestURLFromResponse(srcDynsrc, resp.Resp.Request.URL.String(), "img", "dynsrc", resp))
 		}
 		srcLongdesc, ok := item.Attr("longdesc")
 		if ok && srcLongdesc != "" {
@@ -302,7 +302,7 @@ func bodyImgTagParser(resp *navigation.Response) (navigationRequests []*navigati
 		}
 		srcLowsrc, ok := item.Attr("lowsrc")
 		if ok && srcLowsrc != "" {
-			navigationRequests = append(navigationRequests, navigation.NewNavigationRequestURLFromResponse(srcLowsrc, resp.Resp.Request.URL.String(), "img", "lowsrc", resp))
+			navigationRequests = append(navigationRequests, navigation.NewNavigationHeadRequestURLFromResponse(srcLowsrc, resp.Resp.Request.URL.String(), "img", "lowsrc", resp))
 		}
 		src, ok := item.Attr("src")
 		if ok && src != "" && src != "#" {
@@ -310,12 +310,12 @@ func bodyImgTagParser(resp *navigation.Response) (navigationRequests []*navigati
 				// TODO: Add data:uri/data:image parsing
 				return
 			}
-			navigationRequests = append(navigationRequests, navigation.NewNavigationRequestURLFromResponse(src, resp.Resp.Request.URL.String(), "img", "src", resp))
+			navigationRequests = append(navigationRequests, navigation.NewNavigationHeadRequestURLFromResponse(src, resp.Resp.Request.URL.String(), "img", "src", resp))
 		}
 		srcSet, ok := item.Attr("srcset")
 		if ok && srcSet != "" {
 			for _, value := range utils.ParseSRCSetTag(srcSet) {
-				navigationRequests = append(navigationRequests, navigation.NewNavigationRequestURLFromResponse(value, resp.Resp.Request.URL.String(), "img", "srcset", resp))
+				navigationRequests = append(navigationRequests, navigation.NewNavigationHeadRequestURLFromResponse(value, resp.Resp.Request.URL.String(), "img", "srcset", resp))
 			}
 		}
 	})
@@ -382,18 +382,19 @@ func bodyTableTagParser(resp *navigation.Response) (navigationRequests []*naviga
 // bodyVideoTagParser parses video tag from response
 func bodyVideoTagParser(resp *navigation.Response) (navigationRequests []*navigation.Request) {
 	resp.Reader.Find("video").Each(func(i int, item *goquery.Selection) {
+		gologger.Warning().Msg("XXXX mached a video")
 		src, ok := item.Attr("src")
 		if ok && src != "" {
-			navigationRequests = append(navigationRequests, navigation.NewNavigationRequestURLFromResponse(src, resp.Resp.Request.URL.String(), "video", "src", resp))
+			navigationRequests = append(navigationRequests, navigation.NewNavigationHeadRequestURLFromResponse(src, resp.Resp.Request.URL.String(), "video", "src", resp))
 		}
 		srcData, ok := item.Attr("poster")
 		if ok && srcData != "" {
-			navigationRequests = append(navigationRequests, navigation.NewNavigationRequestURLFromResponse(srcData, resp.Resp.Request.URL.String(), "video", "poster", resp))
+			navigationRequests = append(navigationRequests, navigation.NewNavigationHeadRequestURLFromResponse(srcData, resp.Resp.Request.URL.String(), "video", "poster", resp))
 		}
 		item.Find("track").Each(func(i int, s *goquery.Selection) {
 			srcValue, ok := s.Attr("src")
 			if ok && srcValue != "" {
-				navigationRequests = append(navigationRequests, navigation.NewNavigationRequestURLFromResponse(srcValue, resp.Resp.Request.URL.String(), "video", "track-src", resp))
+				navigationRequests = append(navigationRequests, navigation.NewNavigationHeadRequestURLFromResponse(srcValue, resp.Resp.Request.URL.String(), "video", "track-src", resp))
 			}
 		})
 	})

@@ -29,6 +29,8 @@ func (n *Request) RequestURL() string {
 	switch n.Method {
 	case "GET":
 		return n.URL
+	case "HEAD":
+		return n.URL
 	case "POST":
 		builder := &strings.Builder{}
 		builder.WriteString(n.URL)
@@ -40,11 +42,26 @@ func (n *Request) RequestURL() string {
 	return ""
 }
 
-// newNavigationRequestURL generates a navigation request from a relative URL
+// NewNavigationRequestURLFromResponse generates a navigation request from a relative URL
 func NewNavigationRequestURLFromResponse(path, source, tag, attribute string, resp *Response) *Request {
 	requestURL := resp.AbsoluteURL(path)
 	request := &Request{
 		Method:       http.MethodGet,
+		URL:          requestURL,
+		RootHostname: resp.RootHostname,
+		Depth:        resp.Depth,
+		Source:       source,
+		Attribute:    attribute,
+		Tag:          tag,
+	}
+	return request
+}
+
+// NewNavigationHeadRequestURLFromResponse generates a navigation request from a relative URL
+func NewNavigationHeadRequestURLFromResponse(path, source, tag, attribute string, resp *Response) *Request {
+	requestURL := resp.AbsoluteURL(path)
+	request := &Request{
+		Method:       http.MethodHead,
 		URL:          requestURL,
 		RootHostname: resp.RootHostname,
 		Depth:        resp.Depth,
