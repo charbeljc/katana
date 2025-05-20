@@ -16,7 +16,7 @@ func TestValidatorValidate(t *testing.T) {
 	require.Equal(t, Regular, validator.ValidatePath("main.go"), "could not validate correct data with no custom extensions")
 
 	validator = NewValidator([]string{"png"}, nil)
-	require.Equal(t, Regular, validator.ValidatePath("main.png"), "could not validate correct data with default denylist bypass")
+	require.Equal(t, Media, validator.ValidatePath("main.png"), "could not validate correct data with default denylist bypass")
 
 	validator = NewValidator(nil, nil)
 	require.Equal(t, Media, validator.ValidatePath("main.png"), "could not validate correct data with default denylist bypass")

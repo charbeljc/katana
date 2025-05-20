@@ -72,7 +72,6 @@ func (e *Validator) ValidatePath(item string) Status {
 	if err != nil {
 		gologger.Warning().Msgf("validatepath: failed to parse url %v got %v", item, err)
 	}
-	gologger.Debug().Msgf("VALIDATE path, `%v`, item: %v", u.Path, item)
 
 	if u.Path != "" {
 		extension = strings.ToLower(path.Ext(u.Path))
@@ -84,6 +83,9 @@ func (e *Validator) ValidatePath(item string) Status {
 	}
 	if len(e.extensionsMatch) > 0 {
 		if _, ok := e.extensionsMatch[extension]; ok {
+			if _, ok := e.mediaFilter[extension]; ok {
+				return Media
+			}
 			return Regular
 		}
 		return Skip

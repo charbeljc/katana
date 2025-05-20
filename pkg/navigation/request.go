@@ -29,6 +29,8 @@ func (n *Request) RequestURL() string {
 	switch n.Method {
 	case "GET":
 		return n.URL
+	case "HEAD":
+		return n.URL
 	case "POST":
 		builder := &strings.Builder{}
 		builder.WriteString(n.URL)
@@ -40,7 +42,7 @@ func (n *Request) RequestURL() string {
 	return ""
 }
 
-// newNavigationRequestURL generates a navigation request from a relative URL
+// NewNavigationRequestURLFromResponse generates a navigation request from a relative URL
 func NewNavigationRequestURLFromResponse(path, source, tag, attribute string, resp *Response) *Request {
 	requestURL := resp.AbsoluteURL(path)
 	request := &Request{

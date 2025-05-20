@@ -1,6 +1,7 @@
 security-crawl-maze/
 cmd/katana/katana
-katana
+/katana
+/integration_tests/katana
 *.exe
 katana_*/
 katana_*/

@@ -216,8 +216,12 @@ func (s *Shared) Do(crawlSession *CrawlSession, doRequest DoRequestFunc) error {
 		}
 
 		if s.Options.ValidatePath(req.URL) == extensions.Media {
-			gologger.Debug().Msgf("%v` filtered path (media), skipping", req.URL)
-			continue // TODO or req.Method = http.MethodHead, but before ad a test case
+			if s.Options.Options.EnableMediaHead {
+				req.Method = http.MethodHead // FIXME, changing behavior, need an integration test for it
+			} else if !s.Options.Options.EnableMedia {
+				gologger.Debug().Msgf("%v` filtered path, skipping", req.URL)
+				continue
+			}
 		}
 
 		inScope, scopeErr := s.Options.ValidateScope(req.URL, crawlSession.Hostname)
