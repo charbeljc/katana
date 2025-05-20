@@ -204,6 +204,10 @@ pipelines offering both headless and non-headless crawling.`)
 		flagSet.BoolVar(&options.Version, "version", false, "display project version"),
 	)
 
+	flagSet.CreateGroup("media", "Media",
+		flagSet.IntVarP(&options.MediaHead, "media", "m", false, "do HEAD requests on media elements"),
+	)
+
 	if err := flagSet.Parse(); err != nil {
 		return nil, errorutil.NewWithErr(err).Msgf("could not parse flags")
 	}
