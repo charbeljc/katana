@@ -205,7 +205,7 @@ pipelines offering both headless and non-headless crawling.`)
 	)
 
 	flagSet.CreateGroup("media", "Media",
-		flagSet.IntVarP(&options.MediaHead, "media", "m", false, "do HEAD requests on media elements"),
+		flagSet.BoolVarP(&options.EnableMedia, "media", "m", false, "do HEAD requests on media elements"),
 	)
 
 	if err := flagSet.Parse(); err != nil {

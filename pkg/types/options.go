@@ -16,6 +16,7 @@ import (
 // OnResultCallback (output.Result)
 type OnResultCallback func(output.Result)
 
+// Options katana options
 type Options struct {
 	// URLs contains a list of URLs for crawling
 	URLs goflags.StringSlice
@@ -161,6 +162,8 @@ type Options struct {
 	TlsImpersonate bool
 	//DisableRedirects disables the following of redirects
 	DisableRedirects bool
+	//EnableMediaHead enables sending HEAD requests for media url
+	EnableMedia bool
 }
 
 func (options *Options) ParseCustomHeaders() map[string]string {
