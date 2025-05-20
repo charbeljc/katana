@@ -18,7 +18,7 @@ type Validator struct {
 }
 
 // NewValidator creates a new extension validator instance
-func NewValidator(extensionsMatch, extensionsFilter []string) *Validator {
+func NewValidator(extensionsMatch, extensionsFilter []string, enableMedia bool) *Validator {
 	validator := &Validator{
 		extensionsMatch:  make(map[string]struct{}),
 		extensionsFilter: make(map[string]struct{}),
@@ -27,8 +27,11 @@ func NewValidator(extensionsMatch, extensionsFilter []string) *Validator {
 	for _, extension := range extensionsMatch {
 		validator.extensionsMatch[normalizeExtension(extension)] = struct{}{}
 	}
-	for _, item := range defaultDenylist {
-		validator.extensionsFilter[normalizeExtension(item)] = struct{}{}
+
+	if !enableMedia {
+		for _, item := range defaultDenylist {
+			validator.extensionsFilter[normalizeExtension(item)] = struct{}{}
+		}
 	}
 	for _, extension := range extensionsFilter {
 		validator.extensionsFilter[normalizeExtension(extension)] = struct{}{}
