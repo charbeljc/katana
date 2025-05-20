@@ -382,7 +382,6 @@ func bodyTableTagParser(resp *navigation.Response) (navigationRequests []*naviga
 // bodyVideoTagParser parses video tag from response
 func bodyVideoTagParser(resp *navigation.Response) (navigationRequests []*navigation.Request) {
 	resp.Reader.Find("video").Each(func(i int, item *goquery.Selection) {
-		gologger.Warning().Msg("XXXX mached a video")
 		src, ok := item.Attr("src")
 		if ok && src != "" {
 			navigationRequests = append(navigationRequests, navigation.NewNavigationHeadRequestURLFromResponse(src, resp.Resp.Request.URL.String(), "video", "src", resp))
