@@ -17,6 +17,7 @@ import (
 	"github.com/projectdiscovery/katana/pkg/output"
 	"github.com/projectdiscovery/katana/pkg/types"
 	"github.com/projectdiscovery/katana/pkg/utils"
+	"github.com/projectdiscovery/katana/pkg/utils/extensions"
 	"github.com/projectdiscovery/katana/pkg/utils/queue"
 	"github.com/projectdiscovery/retryablehttp-go"
 	errorutil "github.com/projectdiscovery/utils/errors"
@@ -191,6 +192,7 @@ func (s *Shared) NewCrawlSessionWithURL(URL string) (*CrawlSession, error) {
 
 type DoRequestFunc func(crawlSession *CrawlSession, req *navigation.Request) (*navigation.Response, error)
 
+// Do it
 func (s *Shared) Do(crawlSession *CrawlSession, doRequest DoRequestFunc) error {
 	wg := sizedwaitgroup.New(s.Options.Options.Concurrency)
 	for item := range crawlSession.Queue.Pop() {
@@ -208,9 +210,14 @@ func (s *Shared) Do(crawlSession *CrawlSession, doRequest DoRequestFunc) error {
 			continue
 		}
 
-		if !s.Options.ValidatePath(req.URL) {
+		if s.Options.ValidatePath(req.URL) == extensions.Skip {
 			gologger.Debug().Msgf("`%v` filtered path. skipping", req.URL)
 			continue
+		}
+
+		if s.Options.ValidatePath(req.URL) == extensions.Media {
+			gologger.Debug().Msgf("%v` filtered path (media), skipping", req.URL)
+			continue // TODO or req.Method = http.MethodHead, but before ad a test case
 		}
 
 		inScope, scopeErr := s.Options.ValidateScope(req.URL, crawlSession.Hostname)

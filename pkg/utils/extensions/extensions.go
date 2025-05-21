@@ -9,18 +9,47 @@ import (
 )
 
 // defaultDenylist is the default list of extensions to be denied
-var defaultDenylist = []string{".3g2", ".3gp", ".7z", ".apk", ".arj", ".avi", ".axd", ".bmp", ".csv", ".deb", ".dll", ".doc", ".drv", ".eot", ".exe", ".flv", ".gif", ".gifv", ".gz", ".h264", ".ico", ".iso", ".jar", ".jpeg", ".jpg", ".lock", ".m4a", ".m4v", ".map", ".mkv", ".mov", ".mp3", ".mp4", ".mpeg", ".mpg", ".msi", ".ogg", ".ogm", ".ogv", ".otf", ".pdf", ".pkg", ".png", ".ppt", ".psd", ".rar", ".rm", ".rpm", ".svg", ".swf", ".sys", ".tar.gz", ".tar", ".tif", ".tiff", ".ttf", ".txt", ".vob", ".wav", ".webm", ".webp", ".wmv", ".woff", ".woff2", ".xcf", ".xls", ".xlsx", ".zip"}
+var defaultDenylist = []string{".3g2", ".3gp", ".7z", ".apk", ".arj", ".avi", ".axd", ".bmp", ".csv", ".deb", ".dll", ".doc", ".drv", ".eot", ".exe",
+	".flv", ".gif", ".gifv", ".gz", ".h264", ".ico", ".iso", ".jar", ".jpeg", ".jpg", ".lock", ".m4a", ".m4v", ".map", ".mkv", ".mov", ".mp3", ".mp4",
+	".mpeg", ".mpg", ".msi", ".ogg", ".ogm", ".ogv", ".otf", ".pdf", ".pkg", ".png", ".ppt", ".psd", ".rar", ".rm", ".rpm", ".svg", ".swf", ".sys", ".tar.gz",
+	".tar", ".tif", ".tiff", ".ttf", ".txt", ".vob", ".wav", ".webm", ".webp", ".wmv", ".woff", ".woff2", ".xcf", ".xls", ".xlsx", ".zip"}
 
 // Validator is a validator for file extension
 type Validator struct {
 	extensionsMatch  map[string]struct{}
+	mediaFilter      map[string]struct{}
 	extensionsFilter map[string]struct{}
+}
+
+// Status for URL Path
+type Status int
+
+const (
+	// Skip this URL
+	Skip Status = iota
+	// Regular one, crawl it
+	Regular
+	// Media one, you should do as you want (eg use HEAD method
+	Media
+)
+
+func (s Status) String() string {
+	switch s {
+	case Skip:
+		return "skip"
+	case Regular:
+		return "regular"
+	case Media:
+		return "media"
+	}
+	return "unknown"
 }
 
 // NewValidator creates a new extension validator instance
 func NewValidator(extensionsMatch, extensionsFilter []string) *Validator {
 	validator := &Validator{
 		extensionsMatch:  make(map[string]struct{}),
+		mediaFilter:      make(map[string]struct{}),
 		extensionsFilter: make(map[string]struct{}),
 	}
 
@@ -28,7 +57,7 @@ func NewValidator(extensionsMatch, extensionsFilter []string) *Validator {
 		validator.extensionsMatch[normalizeExtension(extension)] = struct{}{}
 	}
 	for _, item := range defaultDenylist {
-		validator.extensionsFilter[normalizeExtension(item)] = struct{}{}
+		validator.mediaFilter[normalizeExtension(item)] = struct{}{}
 	}
 	for _, extension := range extensionsFilter {
 		validator.extensionsFilter[normalizeExtension(extension)] = struct{}{}
@@ -37,31 +66,40 @@ func NewValidator(extensionsMatch, extensionsFilter []string) *Validator {
 }
 
 // ValidatePath returns true if an extension is allowed by the validator
-func (e *Validator) ValidatePath(item string) bool {
+func (e *Validator) ValidatePath(item string) Status {
 	var extension string
 	u, err := urlutil.Parse(item)
 	if err != nil {
 		gologger.Warning().Msgf("validatepath: failed to parse url %v got %v", item, err)
 	}
+	gologger.Debug().Msgf("VALIDATE path, `%v`, item: %v", u.Path, item)
+
 	if u.Path != "" {
 		extension = strings.ToLower(path.Ext(u.Path))
 	} else {
-		extension = strings.ToLower(path.Ext(item))
+		extension = strings.ToLower(path.Ext(item)) // FIXME, no path, no path validation
 	}
 	if extension == "" && len(e.extensionsMatch) > 0 {
-		return false
+		return Skip
 	}
 	if len(e.extensionsMatch) > 0 {
 		if _, ok := e.extensionsMatch[extension]; ok {
-			return true
+			return Regular
 		}
-		return false
+		return Skip
 	}
 
-	if _, ok := e.extensionsFilter[extension]; ok {
-		return false
+	if len(e.extensionsFilter) > 0 {
+		if _, ok := e.extensionsFilter[extension]; ok {
+			return Skip
+		}
 	}
-	return true
+
+	if _, ok := e.mediaFilter[extension]; ok {
+		return Media
+	}
+
+	return Regular
 }
 
 func normalizeExtension(extension string) string {

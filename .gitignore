@@ -5,6 +5,8 @@ katana
 katana_*/
 katana_*/
 dist/
-
+*-test
+__debug_bin*
 .vscode
 .devcontainer
+

@@ -134,11 +134,12 @@ func (c *CrawlerOptions) Close() error {
 	return c.OutputWriter.Close()
 }
 
-func (c *CrawlerOptions) ValidatePath(path string) bool {
+// ValidatePath verify that the path should be fetched
+func (c *CrawlerOptions) ValidatePath(path string) extensions.Status {
 	if c.ExtensionsValidator != nil {
 		return c.ExtensionsValidator.ValidatePath(path)
 	}
-	return true
+	return extensions.Regular
 }
 
 // ValidateScope validates scope for an AbsURL

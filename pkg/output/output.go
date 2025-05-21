@@ -159,7 +159,7 @@ func (w *StandardWriter) Write(result *Result) error {
 		storeFields(result, w.storeFields)
 	}
 
-	if !w.extensionValidator.ValidatePath(result.Request.URL) {
+	if w.extensionValidator.ValidatePath(result.Request.URL) == extensions.Skip {
 		return errors.New("result does not match extension filter")
 	}
 
